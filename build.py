@@ -10,7 +10,7 @@ import os, re, glob, json, datetime, html as H
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://www.amsic.it"          # dominio definitivo (canonical, sitemap, condivisione)
-VERSIONE = "3"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
+VERSIONE = "4"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
 ANNO = datetime.date.today().year
 OGGI = datetime.date.today().isoformat()
 AGGIORNAMENTO_PRIVACY = "20 ottobre 2026"
