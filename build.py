@@ -10,37 +10,40 @@ import os, re, glob, json, datetime, html as H
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://www.amsic.it"          # dominio definitivo (canonical, sitemap, condivisione)
-VERSIONE = "4"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
+VERSIONE = "6"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
 ANNO = datetime.date.today().year
 OGGI = datetime.date.today().isoformat()
-AGGIORNAMENTO_PRIVACY = "20 ottobre 2026"
+AGGIORNAMENTO_PRIVACY = "24 ottobre 2026"
 
 AZIENDA = {
     "nome": "AMSIC",
     "ragione_sociale": "AMSIC S.r.l. a Socio unico",
-    "indirizzo": "Stradale Primosole 13",
+    "indirizzo": "Via San Giuseppe alla Rena 94",
     "cap": "95121",
     "citta": "Catania",
     "provincia": "CT",
     "piva": "05589250876",
-    "rea": "",              # ← numero REA (es. "CT-123456"): vuoto = non mostrato
-    "capitale": "",         # ← capitale sociale (es. "10.000,00 € i.v."): vuoto = non mostrato
+    "rea": "CT-411659",                 # dalla visura camerale del 13/10/2026
+    "capitale": "€ 10.000,00 i.v.",     # capitale sociale interamente versato
     "tel": "351 964 7981",
     "tel_link": "+393519647981",
-    "whatsapp": "",         # ← quando confermato: "393519647981" (attiva i pulsanti WhatsApp da telefono)
+    "tel_commerciale": "392 208 8304",  # responsabile commerciale: è l'unico numero attivo su WhatsApp
+    "tel_commerciale_link": "+393922088304",
+    "whatsapp": "393922088304",         # vuoto = niente pulsanti WhatsApp
     "email": "direzioneamsic@gmail.com",
-    "pec": "amsic@pec.impresacatania.it",
+    "pec": "amsic@pec.impresecatania.it",      # come in visura (nei PDF del Modello 231 è scritta con un refuso)
     "email_odv": "odvamsic@gmail.com",
     "albo_numero": "PA/015069",
     "albo_sezione": "Sezione regionale Sicilia (Palermo)",
     "albo_categoria": "Categoria 8 – intermediazione e commercio di rifiuti senza detenzione",
-    "albo_classe": "Classe D – quantità annua trattata da 6.000 a meno di 15.000 tonnellate",
+    "albo_classe": "Classe C – quantità annua trattata da 15.000 a meno di 60.000 tonnellate",
+    "albo_validita": "dal 17 marzo 2026 al 17 marzo 2031",
     "odv_presidente": "Prof. Avv. Giuseppe Berretta",
     "revisione_231": "rev. 00 del 12 ottobre 2024",
 }
 INDIRIZZO_COMPLETO = f'{AZIENDA["indirizzo"]}, {AZIENDA["cap"]} {AZIENDA["citta"]} ({AZIENDA["provincia"]})'
-MAPPA_LINK = "https://www.google.com/maps/search/?api=1&query=" + "Stradale+Primosole+13,+95121+Catania+CT"
-MAPPA_EMBED = "https://www.google.com/maps?q=Stradale+Primosole+13,+95121+Catania+CT&output=embed"
+MAPPA_LINK = "https://www.google.com/maps/search/?api=1&query=" + "Via+San+Giuseppe+alla+Rena+94,+95121+Catania+CT"
+MAPPA_EMBED = "https://www.google.com/maps?q=Via+San+Giuseppe+alla+Rena+94,+95121+Catania+CT&output=embed"
 ENDPOINT_MODULO = "https://formsubmit.co/ajax/" + AZIENDA["email"]
 ACTION_MODULO = "https://formsubmit.co/" + AZIENDA["email"]
 
@@ -50,7 +53,7 @@ SERVIZI = [
         "id": "intermediazione", "nome": "Intermediazione rifiuti", "foto": "intermediazione", "icona": "rete",
         "alt": "Stretta di mano sopra un contratto firmato",
         "breve": "Mettiamo in contatto chi produce i rifiuti con trasportatori e impianti autorizzati, alle migliori condizioni.",
-        "testo": "Siamo iscritti all’Albo Nazionale Gestori Ambientali per l’intermediazione e il commercio di rifiuti senza detenzione (categoria 8, classe D). Per ogni rifiuto individuiamo soluzioni affidabili e conformi, tramite partner autorizzati e certificati, e cerchiamo per te le migliori condizioni tecnico-economiche offerte dal mercato. Ogni passaggio è verificato con sistemi di controllo interni e documentazione trasparente.",
+        "testo": "Siamo iscritti all’Albo Nazionale Gestori Ambientali per l’intermediazione e il commercio di rifiuti senza detenzione (categoria 8, classe C). Per ogni rifiuto individuiamo soluzioni affidabili e conformi, tramite partner autorizzati e certificati, e cerchiamo per te le migliori condizioni tecnico-economiche offerte dal mercato. Ogni passaggio è verificato con sistemi di controllo interni e documentazione trasparente.",
         "punti": ["Rifiuti speciali pericolosi e non pericolosi", "Partner verificati con controlli interni", "Documentazione trasparente a ogni passaggio"],
     },
     {
@@ -237,13 +240,13 @@ def testata(pagina):
 </header>'''
 
 def pie():
-    legale = [f'Sede legale: {e(INDIRIZZO_COMPLETO)}', f'P.IVA e C.F. {AZIENDA["piva"]}']
+    legale = [f'Sede legale e operativa: {e(INDIRIZZO_COMPLETO)}', f'P.IVA e C.F. {AZIENDA["piva"]}']
     if AZIENDA["rea"]:
         legale.append(f'REA {e(AZIENDA["rea"])}')
     if AZIENDA["capitale"]:
         legale.append(f'Capitale sociale {e(AZIENDA["capitale"])}')
     legale.append(f'PEC <a href="mailto:{AZIENDA["pec"]}">{AZIENDA["pec"]}</a>')
-    legale.append(f'Albo Nazionale Gestori Ambientali n. {AZIENDA["albo_numero"]}, cat. 8 classe D')
+    legale.append(f'Albo Nazionale Gestori Ambientali n. {AZIENDA["albo_numero"]}, cat. 8 classe C')
     menu = "".join(f'<li><a href="{f}">{e(t)}</a></li>' for f, t in NAV)
     return f'''<footer class="pie">
   {marchio_svg("pie-marchio")}
@@ -260,6 +263,7 @@ def pie():
       <h2 class="pie-titolo">Contatti</h2>
       <ul class="pie-lista pie-contatti">
         <li><a href="tel:{AZIENDA["tel_link"]}">{ico("tel")}{AZIENDA["tel"]}</a></li>
+        <li><a href="https://wa.me/{AZIENDA["whatsapp"]}" target="_blank" rel="noopener">{ico("wa")}{AZIENDA["tel_commerciale"]} · commerciale (WhatsApp)</a></li>
         <li><a href="mailto:{AZIENDA["email"]}">{ico("mail")}{AZIENDA["email"]}</a></li>
         <li><a href="{MAPPA_LINK}" target="_blank" rel="noopener">{ico("pin")}{e(INDIRIZZO_COMPLETO)}</a></li>
       </ul>
@@ -284,7 +288,7 @@ def barra_mobile(pagina):
     wa = btn_wa("btn-wa", "WhatsApp")
     return f'''<div class="barra-mobile" data-barra aria-hidden="true">
   <a class="btn btn-secondario" href="tel:{AZIENDA["tel_link"]}" tabindex="-1" data-evento="chiamata"><span class="btn-ico">{ico("tel")}</span>Chiama</a>
-  {wa.replace('class="btn', 'tabindex="-1" class="btn') if wa else ""}
+  {wa.replace('<a class="btn', '<a tabindex="-1" class="btn', 1) if wa else ""}
   <a class="btn btn-primario" href="{href}" tabindex="-1">Scrivici</a>
 </div>'''
 
@@ -299,6 +303,7 @@ JSONLD_AZIENDA = {
     "logo": BASE + "/assets/logo/icon-512.png",
     "image": BASE + "/assets/img/condivisione.jpg",
     "telephone": AZIENDA["tel_link"],
+    "contactPoint": [{"@type": "ContactPoint", "contactType": "sales", "telephone": AZIENDA["tel_commerciale_link"], "availableLanguage": "Italian"}],
     "email": AZIENDA["email"],
     "vatID": "IT" + AZIENDA["piva"],
     "taxID": AZIENDA["piva"],
@@ -414,7 +419,7 @@ def pagina_home():
 <section class="fatti" aria-label="AMSIC in breve">
   <div class="wrap fatti-griglia">
     <div class="fatto rivela"><strong>20+</strong><span>anni di esperienza del team nella gestione dei rifiuti speciali</span></div>
-    <div class="fatto rivela"><strong>Cat. 8</strong><span>Albo Nazionale Gestori Ambientali, classe D: da 6.000 a 15.000 t/anno</span></div>
+    <div class="fatto rivela"><strong>Cat. 8</strong><span>Albo Nazionale Gestori Ambientali, classe C: da 15.000 a 60.000 t/anno</span></div>
     <div class="fatto rivela"><strong>P · NP</strong><span>rifiuti speciali pericolosi e non pericolosi</span></div>
     <div class="fatto rivela"><strong>231</strong><span>Modello organizzativo vigilato da un Organismo indipendente</span></div>
   </div>
@@ -571,7 +576,7 @@ def pagina_servizi():
     </div>
     <div>
       <p>L’intermediario organizza per conto di terzi il conferimento dei rifiuti destinati a recupero o smaltimento. Non li trasporta e non li tratta direttamente: si interpone tra chi produce o detiene i rifiuti e le imprese autorizzate a trasportarli, recuperarli o smaltirli, e ne verifica l’idoneità.</p>
-      <p>Per svolgere questa attività serve l’iscrizione alla categoria 8 dell’Albo Nazionale Gestori Ambientali (art. 212 del D.Lgs. 152/2006). AMSIC è iscritta con il numero {AZIENDA["albo_numero"]}, classe D.</p>
+      <p>Per svolgere questa attività serve l’iscrizione alla categoria 8 dell’Albo Nazionale Gestori Ambientali (art. 212 del D.Lgs. 152/2006). AMSIC è iscritta con il numero {AZIENDA["albo_numero"]}, classe C.</p>
       {btn("Vedi le autorizzazioni", "trasparenza.html#autorizzazioni", "btn-testo", "freccia")}
     </div>
   </div>
@@ -628,6 +633,7 @@ def pagina_trasparenza():
       <div><dt>Categoria</dt><dd>{e(AZIENDA["albo_categoria"])}</dd></div>
       <div><dt>Classe</dt><dd>{e(AZIENDA["albo_classe"])}</dd></div>
       <div><dt>Rifiuti gestiti</dt><dd>Pericolosi e non pericolosi</dd></div>
+      <div><dt>Validità</dt><dd>{e(AZIENDA["albo_validita"])}</dd></div>
     </dl>
   </div>
 </section>
@@ -686,7 +692,7 @@ def pagina_trasparenza():
 {banda_cta()}
 '''
     return documento("trasparenza.html", "Trasparenza e Modello 231 | AMSIC",
-                     "Iscrizione all’Albo Gestori Ambientali n. PA/015069 (cat. 8, classe D), Modello 231 con Organismo di Vigilanza indipendente, canali di segnalazione e documenti da scaricare.",
+                     "Iscrizione all’Albo Gestori Ambientali n. PA/015069 (cat. 8, classe C), Modello 231 con Organismo di Vigilanza indipendente, canali di segnalazione e documenti da scaricare.",
                      corpo, jsonld=[JSONLD_AZIENDA])
 
 def opzioni_servizi():
@@ -732,9 +738,10 @@ def pagina_contatti():
     <aside class="contatti-info rivela" aria-label="Recapiti">
       <ul class="recapiti">
         <li><span class="icona-rombo">{ico("tel")}</span><div><h2>Telefono</h2><p><a href="tel:{AZIENDA["tel_link"]}" data-evento="chiamata">{AZIENDA["tel"]}</a></p></div></li>
+        <li><span class="icona-rombo">{ico("wa")}</span><div><h2>Responsabile commerciale · anche WhatsApp</h2><p><a href="tel:{AZIENDA["tel_commerciale_link"]}" data-evento="chiamata">{AZIENDA["tel_commerciale"]}</a></p></div></li>
         <li><span class="icona-rombo">{ico("mail")}</span><div><h2>Email</h2><p><a href="mailto:{AZIENDA["email"]}">{AZIENDA["email"]}</a></p></div></li>
         <li><span class="icona-rombo">{ico("pec")}</span><div><h2>PEC</h2><p><a href="mailto:{AZIENDA["pec"]}">{AZIENDA["pec"]}</a></p></div></li>
-        <li><span class="icona-rombo">{ico("pin")}</span><div><h2>Sede legale</h2><p>{e(INDIRIZZO_COMPLETO)}<br><a href="{MAPPA_LINK}" target="_blank" rel="noopener">Apri in Google Maps</a></p></div></li>
+        <li><span class="icona-rombo">{ico("pin")}</span><div><h2>Sede legale e operativa</h2><p>{e(INDIRIZZO_COMPLETO)}<br><a href="{MAPPA_LINK}" target="_blank" rel="noopener">Apri in Google Maps</a></p></div></li>
       </ul>
       {btn_wa("btn-wa")}
       <div class="mappa" data-mappa="{MAPPA_EMBED}">
@@ -784,7 +791,8 @@ PRIVACY = f'''
 <ul>
 <li>GitHub, Inc. (ospitalità del sito);</li>
 <li>FormSubmit (formsubmit.co), il servizio che inoltra alla nostra casella email i messaggi inviati con il modulo;</li>
-<li>Google (servizio di posta elettronica e, solo se la apri, mappa di Google Maps).</li>
+<li>Google (servizio di posta elettronica e, solo se la apri, mappa di Google Maps);</li>
+<li>WhatsApp (Meta Platforms), solo se scegli di scriverci su WhatsApp.</li>
 </ul>
 <p>Alcuni di questi fornitori hanno sede negli Stati Uniti: il trasferimento avviene sulla base della decisione di adeguatezza della Commissione europea (EU-U.S. Data Privacy Framework) o delle clausole contrattuali standard. I dati non sono diffusi né usati per finalità di marketing.</p>
 <h2>6. I tuoi diritti</h2>
