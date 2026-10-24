@@ -10,7 +10,7 @@ import os, re, glob, json, datetime, html as H
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://www.amsic.it"          # dominio definitivo (canonical, sitemap, condivisione)
-VERSIONE = "6"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
+VERSIONE = "7"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
 ANNO = datetime.date.today().year
 OGGI = datetime.date.today().isoformat()
 GOOGLE_VERIFICA = "l3V-7dkjAfRdMd8adwk6uq7UDjQDXtpb1NbwODb5PtI"   # Search Console (account Freeze Studio), proprietà https://www.amsic.it/ — non togliere
@@ -280,7 +280,7 @@ def pie():
   </div>
   <div class="wrap pie-legale">
     <p>{" · ".join(legale)}</p>
-    <p class="pie-fondo"><span>© {ANNO} {e(AZIENDA["ragione_sociale"])}</span><a href="privacy.html">Privacy</a><a href="cookie.html">Cookie</a><span class="pie-firma">Sito di Freeze Studio</span></p>
+    <p class="pie-fondo"><span>© {ANNO} {e(AZIENDA["ragione_sociale"])}</span><a href="privacy.html">Privacy</a><a href="cookie.html">Cookie</a><a class="pie-firma" href="https://freezestudio.it/" target="_blank" rel="noopener">Sito realizzato da Freeze Studio</a></p>
   </div>
 </footer>'''
 
@@ -312,6 +312,17 @@ JSONLD_AZIENDA = {
                 "addressLocality": AZIENDA["citta"], "addressRegion": AZIENDA["provincia"], "addressCountry": "IT"},
 }
 
+JSONLD_SITO = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": BASE + "/#sito",
+    "name": "AMSIC",
+    "alternateName": ["AMSIC S.r.l.", "AMSIC srl"],
+    "url": BASE + "/",
+    "inLanguage": "it-IT",
+    "publisher": {"@id": BASE + "/#azienda"},
+}
+
 def documento(pagina, titolo, descrizione, corpo, jsonld=None, noindex=False, tipo="website"):
     url = BASE + "/" + ("" if pagina == "index.html" else pagina[:-5])
     robots = '<meta name="robots" content="noindex, follow">' if noindex else ""
@@ -339,9 +350,11 @@ def documento(pagina, titolo, descrizione, corpo, jsonld=None, noindex=False, ti
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="assets/logo/favicon-96.png" sizes="96x96" type="image/png">
 <link rel="icon" href="assets/logo/amsic-marchio.svg" type="image/svg+xml">
-<link rel="icon" href="assets/logo/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="assets/font/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/font/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/stile.css?v={VERSIONE}">
@@ -400,7 +413,7 @@ def pagina_home():
     <div class="eroe-testo">
       {occhiello("Intermediazione rifiuti speciali · Catania")}
       <h1>Gestione sicura, <span class="a-capo">ambiente protetto.</span></h1>
-      <p class="lead">Organizziamo per la tua azienda raccolta, trasporto e avvio a recupero o smaltimento dei rifiuti speciali, pericolosi e non pericolosi, con trasportatori e impianti autorizzati. Un solo interlocutore, ogni passaggio tracciato.</p>
+      <p class="lead">AMSIC organizza per la tua azienda raccolta, trasporto e avvio a recupero o smaltimento dei rifiuti speciali, pericolosi e non pericolosi, con trasportatori e impianti autorizzati. Un solo interlocutore, ogni passaggio tracciato.</p>
       <div class="azioni" data-sentinella>{btn("Richiedi una consulenza", "contatti.html#modulo", "btn-primario", "freccia")}{btn_tel()}</div>
       <ul class="garanzie">
         <li>{ico("check")}Albo Gestori Ambientali n. {AZIENDA["albo_numero"]}</li>
@@ -476,9 +489,9 @@ def pagina_home():
 {banda_cta()}
 '''
     return documento("index.html",
-                     "AMSIC | Intermediazione e gestione rifiuti speciali a Catania",
+                     "AMSIC S.r.l. | Intermediazione e gestione rifiuti speciali a Catania",
                      "Raccolta, trasporto, smaltimento e recupero di rifiuti speciali pericolosi e non pericolosi tramite partner autorizzati. Iscritti all’Albo Gestori Ambientali (cat. 8), Modello 231. Catania.",
-                     corpo, jsonld=[JSONLD_AZIENDA])
+                     corpo, jsonld=[JSONLD_SITO, JSONLD_AZIENDA])
 
 def pagina_chi_siamo():
     valori = "".join(f'<li class="valore rivela"><h3>{e(t)}</h3><p>{e(d)}</p></li>' for t, d in VALORI)
@@ -872,6 +885,12 @@ def main():
     with open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8") as f:
         f.write(f"User-agent: *\nAllow: /\n\nSitemap: {BASE}/sitemap.xml\n")
     open(os.path.join(ROOT, ".nojekyll"), "w").close()
+    manifest = {"name": AZIENDA["ragione_sociale"], "short_name": "AMSIC", "start_url": "/", "display": "browser",
+                "background_color": "#ffffff", "theme_color": "#1F4D9B",
+                "icons": [{"src": "/assets/logo/icon-192.png", "sizes": "192x192", "type": "image/png"},
+                          {"src": "/assets/logo/icon-512.png", "sizes": "512x512", "type": "image/png"}]}
+    with open(os.path.join(ROOT, "site.webmanifest"), "w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
     print("pagine generate:", ", ".join(PAGINE))
 
 if __name__ == "__main__":

@@ -67,6 +67,12 @@ def loghi():
         d.polygon([(off + x * k, off + y * k) for x, y in MARCHIO], fill=BLU)
         return im.resize((lato, lato), Image.LANCZOS)
     marchio_png(32, (0, 0, 0, 0), 0.02).save(os.path.join(LOGO, "favicon-32.png"))
+    # Google mostra la favicon nei risultati solo se è quadrata e multipla di 48 px (48, 96, 144…)
+    marchio_png(48, (255, 255, 255, 255), 0.06).convert("RGB").save(os.path.join(LOGO, "favicon-48.png"))
+    marchio_png(96, (255, 255, 255, 255), 0.06).convert("RGB").save(os.path.join(LOGO, "favicon-96.png"))
+    marchio_png(192, (255, 255, 255, 255), 0.12).convert("RGB").save(os.path.join(LOGO, "icon-192.png"))
+    # favicon.ico nella radice del sito (16, 32 e 48 px), cercata da browser e motori di ricerca
+    marchio_png(256, (255, 255, 255, 255), 0.06).save(os.path.join(ROOT, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48)])
     marchio_png(180, (255, 255, 255, 255), 0.16).convert("RGB").save(os.path.join(LOGO, "apple-touch-icon.png"))
     marchio_png(512, (255, 255, 255, 255), 0.16).convert("RGB").save(os.path.join(LOGO, "icon-512.png"))
 

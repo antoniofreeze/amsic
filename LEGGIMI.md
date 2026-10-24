@@ -36,3 +36,9 @@ Record DNS da impostare nel pannello Aruba:
 
 Poi: file `CNAME` con `www.amsic.it` nel repository, dominio personalizzato nelle impostazioni Pages, "Enforce HTTPS" quando il certificato è pronto.
 Non toccare eventuali record MX/SPF della posta.
+
+## Motori di ricerca
+
+- **Google Search Console**: proprietà `https://www.amsic.it/` sull'account freezestudio.marketing@gmail.com, verificata con il meta tag `GOOGLE_VERIFICA` in `build.py` (non toglierlo). Sitemap inviata.
+- **IndexNow** (Bing, DuckDuckGo, Ecosia, Yandex): chiave nel file `52e5ea14ec2e2a4e395917e23c9dc1ed.txt` nella radice (non toglierlo). Dopo un aggiornamento importante si possono segnalare le pagine con una richiesta POST a `https://api.indexnow.org/indexnow` con `host`, `key`, `keyLocation` e `urlList`.
+- **Favicon**: `favicon.ico` nella radice + PNG da 48/96 px (Google la mostra solo se quadrata e multipla di 48 px). Si rigenerano con `prepara_asset.py`.
