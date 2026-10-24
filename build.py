@@ -13,6 +13,7 @@ BASE = "https://www.amsic.it"          # dominio definitivo (canonical, sitemap,
 VERSIONE = "6"                         # ← aumentare a ogni modifica di CSS o JS (evita la cache dei browser)
 ANNO = datetime.date.today().year
 OGGI = datetime.date.today().isoformat()
+GOOGLE_VERIFICA = "l3V-7dkjAfRdMd8adwk6uq7UDjQDXtpb1NbwODb5PtI"   # Search Console (account Freeze Studio), proprietà https://www.amsic.it/ — non togliere
 AGGIORNAMENTO_PRIVACY = "24 ottobre 2026"
 
 AZIENDA = {
@@ -326,6 +327,7 @@ def documento(pagina, titolo, descrizione, corpo, jsonld=None, noindex=False, ti
 <title>{e(titolo)}</title>
 <meta name="description" content="{e(descrizione)}">
 {robots}{canon}
+<meta name="google-site-verification" content="{GOOGLE_VERIFICA}">
 <meta name="theme-color" content="#1F4D9B">
 <meta property="og:type" content="{tipo}">
 <meta property="og:locale" content="it_IT">
